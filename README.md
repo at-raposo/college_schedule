@@ -55,12 +55,6 @@ O layout possui um painel lateral de estatísticas ("Sticky") em telas grandes. 
 
 Contribuições são bem-vindas! Se você quiser adicionar novas matérias, corrigir pré-requisitos ou melhorar o estilo:
 
-1.  Faça um Fork do projeto.
-2.  Crie uma Branch para sua Feature (`git checkout -b feature/NovaFeature`).
-3.  Faça o Commit (`git commit -m 'Adicionando nova feature'`).
-4.  Faça o Push (`git push origin feature/NovaFeature`).
-5.  Abra um Pull Request.
-
 ## 📝 Licença
 
 Este projeto está sob a licença MIT. Sinta-se livre para usá-lo e modificá-lo para suas necessidades acadêmicas.
