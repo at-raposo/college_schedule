@@ -3,18 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tracker BMAC - Métodos Matemáticos (Grade Oficial)</title>
+    <title>Tracker BMAC - Tabela de Controle</title>
     <style>
         :root {
             --bg-body: #0f172a;
             --bg-card: #1e293b;
+            --bg-table-header: #334155;
             --text-main: #f1f5f9;
             --text-muted: #94a3b8;
             --primary: #38bdf8;
             --secondary: #a855f7;
-            --tertiary: #f59e0b;
             --success: #22c55e;
-            --border: #334155;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #475569;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -23,668 +25,423 @@
             background-color: var(--bg-body);
             color: var(--text-main);
             display: flex;
-            min-height: 100vh;
+            height: 100vh;
+            overflow: hidden; /* Sidebar fixa, conteudo scrolla */
         }
 
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 340px;
-            gap: 2rem;
-            max-width: 1600px;
-            margin: 0 auto;
+        /* --- SIDEBAR (DASHBOARD) --- */
+        .sidebar {
+            width: 320px;
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
             padding: 2rem;
-            width: 100%;
-        }
-
-        .main-content {
             display: flex;
             flex-direction: column;
             gap: 2rem;
-        }
-
-        header h1 { color: var(--primary); margin-bottom: 0.5rem; }
-        header p { color: var(--text-muted); }
-
-        /* Estilo dos Blocos de Semestre */
-        .semester-block {
-            background: var(--bg-card);
-            border-radius: 12px;
-            padding: 1.5rem;
-            border: 1px solid var(--border);
-            margin-bottom: 1.5rem;
-        }
-
-        .semester-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border);
-            color: var(--text-main);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .semester-type-badge {
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .badge-obg { background: rgba(56, 189, 248, 0.1); color: var(--primary); }
-        .badge-elet { background: rgba(168, 85, 247, 0.1); color: var(--secondary); }
-        .badge-livre { background: rgba(245, 158, 11, 0.1); color: var(--tertiary); }
-
-        /* Lista de Matérias */
-        .course-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 0.8rem;
-        }
-
-        .course-item {
-            background: rgba(255,255,255, 0.02);
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 10px;
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .course-item:hover {
-            background: rgba(255,255,255, 0.05);
-            border-color: var(--border);
-        }
-
-        /* Checkbox Customizado */
-        .checkbox-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-            padding-top: 2px;
-        }
-
-        input[type="checkbox"] {
-            appearance: none;
-            width: 18px;
-            height: 18px;
-            border: 2px solid var(--text-muted);
-            border-radius: 4px;
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        input[type="checkbox"]:checked {
-            background-color: var(--success);
-            border-color: var(--success);
-        }
-
-        input[type="checkbox"]:checked::after {
-            content: '✔';
-            position: absolute;
-            color: white;
-            font-size: 12px;
-            left: 3px;
-            top: 3px;
-        }
-
-        .course-info { flex: 1; }
-        .course-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 2px; }
-        .code { font-family: monospace; font-weight: bold; color: var(--text-main); }
-        .credits { font-size: 0.75rem; color: var(--text-muted); background: rgba(0,0,0,0.2); padding: 1px 6px; border-radius: 4px; }
-        .name { font-size: 0.9rem; color: var(--text-muted); line-height: 1.3; }
-        
-        /* Highlight quando marcado */
-        input[type="checkbox"]:checked ~ .course-info .name { text-decoration: line-through; opacity: 0.6; }
-        input[type="checkbox"]:checked ~ .course-info .code { color: var(--success); }
-
-        /* Painel Lateral (Sticky) */
-        .sidebar {
-            position: sticky;
-            top: 2rem;
-            height: fit-content;
-            max-height: calc(100vh - 4rem);
+            flex-shrink: 0;
             overflow-y: auto;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
+        }
+
+        .app-title {
+            color: var(--primary);
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255,255,255,0.03);
             border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            padding: 1.2rem;
+            border: 1px solid var(--border);
         }
 
-        .summary-header { margin-bottom: 2rem; text-align: center; }
-        .big-number { font-size: 3rem; font-weight: 800; color: var(--success); line-height: 1; }
-        .big-label { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.5rem; }
-
-        .stat-row { margin-bottom: 1.5rem; }
-        .stat-meta { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--text-main); }
+        .stat-value { font-size: 2.2rem; font-weight: bold; color: var(--text-main); }
+        .stat-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
         
-        .progress-track {
-            background: #0f172a;
-            height: 8px;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .progress-fill { height: 100%; transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .highlight-green { color: var(--success); }
+        .highlight-blue { color: var(--primary); }
+        .highlight-orange { color: var(--warning); }
 
-        .search-bar {
-            margin-bottom: 2rem;
-            position: relative;
+        .progress-container { margin-top: 10px; }
+        .progress-bar { height: 8px; background: #0f172a; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--success); transition: width 0.5s ease; }
+
+        /* --- MAIN CONTENT (TABLE) --- */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
+
+        .search-container { margin-bottom: 1.5rem; }
         .search-input {
             width: 100%;
-            padding: 12px 16px;
+            padding: 12px;
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 8px;
             color: white;
-            font-size: 1rem;
+            border-radius: 6px;
         }
-        .search-input:focus { outline: none; border-color: var(--primary); }
 
-        /* Responsividade */
-        @media (max-width: 1024px) {
-            .container { grid-template-columns: 1fr; }
-            .sidebar { 
-                position: fixed; 
-                bottom: 0; top: auto; left: 0; right: 0; 
-                width: 100%; max-height: 30vh; 
-                z-index: 100; border-radius: 16px 16px 0 0; 
-                border-top: 2px solid var(--primary);
-                display: grid; grid-template-columns: 1fr 2fr; gap: 1rem;
-                padding: 1rem;
-            }
-            .summary-header { margin: 0; display: flex; flex-direction: column; justify-content: center; }
-            .big-number { font-size: 2rem; }
-            .main-content { padding-bottom: 250px; }
+        /* Table Styling */
+        .table-wrapper {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: var(--bg-table-header);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:hover { background: rgba(255,255,255,0.02); }
+        
+        /* Checkboxes */
+        .checkbox-cell { text-align: center; }
+        input[type="checkbox"] {
+            width: 18px; 
+            height: 18px; 
+            cursor: pointer; 
+            accent-color: var(--primary);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: rgba(148, 163, 184, 0.1); color: var(--text-muted); }
+        .status-done { background: rgba(34, 197, 94, 0.1); color: var(--success); }
+        .status-doing { background: rgba(245, 158, 11, 0.1); color: var(--warning); }
+
+        /* Rows Logic */
+        tr.row-done td { opacity: 0.5; }
+        tr.row-done .code, tr.row-done .name { text-decoration: line-through; }
+        
+        tr.row-doing { background: rgba(245, 158, 11, 0.05); }
+        tr.row-doing .name { color: var(--warning); font-weight: 500; }
+
+        .req-text { font-size: 0.8rem; color: var(--text-muted); font-style: italic; }
+        .obs-input { 
+            background: transparent; 
+            border: none; 
+            border-bottom: 1px solid transparent; 
+            color: var(--text-muted); 
+            width: 100%; 
+            font-size: 0.85rem;
+        }
+        .obs-input:focus { outline: none; border-bottom: 1px solid var(--primary); color: white; }
+
+        @media (max-width: 1000px) {
+            body { flex-direction: column; overflow: auto; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); max-height: 300px; }
+            .main-content { overflow: visible; }
+            .table-wrapper { overflow-x: auto; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <main class="main-content">
-        <header>
-            <h1>BMAC - Métodos Matemáticos</h1>
-            <p>Grade Curricular Integral (Obrigatórias + Optativas)</p>
-        </header>
-
-        <div class="search-bar">
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar matéria (ex: Cálculo, MAP, 3º sem)...">
+    <aside class="sidebar">
+        <div>
+            <div class="app-title">BMAC Dashboard</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Controle de Grade Curricular</p>
         </div>
 
-        <div id="curriculumContainer">
+        <div class="stat-card">
+            <div class="stat-label">Concluídas / Total</div>
+            <div class="stat-value highlight-green">
+                <span id="completedCount">0</span> / <span id="totalCount">0</span>
             </div>
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressBar" style="width: 0%"></div>
+                </div>
+                <div style="text-align: right; font-size: 0.8rem; margin-top: 5px; color: var(--success);" id="percentText">0%</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Matérias que faltam</div>
+            <div class="stat-value highlight-blue" id="missingCount">0</div>
+        </div>
+
+        <div class="stat-card" style="border-color: var(--warning);">
+            <div class="stat-label">Cursando Agora</div>
+            <div class="stat-value highlight-orange" id="doingCount">0</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-label">Faltarão (Pós-Semestre)</div>
+            <div class="stat-value" id="projectedMissing" style="color: #f1f5f9;">0</div>
+            <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+                *Cálculo: Total - (Concluídas + Cursando)
+            </p>
+        </div>
+        
+        <button onclick="resetData()" style="padding: 10px; background: #334155; color: white; border: none; border-radius: 6px; cursor: pointer;">
+            Resetar Tudo
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <div class="search-container">
+            <input type="text" id="searchInput" class="search-input" placeholder="🔍 Buscar por código, nome ou pré-requisito...">
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">Ok?</th>
+                        <th style="width: 100px;">Código</th>
+                        <th>Nome da Disciplina</th>
+                        <th style="width: 100px; text-align: center;">Status</th>
+                        <th style="width: 80px; text-align: center;">Cursando?</th>
+                        <th>Pré-requisitos</th>
+                        <th>Observações</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    </tbody>
+            </table>
+        </div>
     </main>
 
-    <aside class="sidebar">
-        <div class="summary-header">
-            <div class="big-number" id="totalCredits">0</div>
-            <div class="big-label">Créditos Totais Realizados</div>
-        </div>
-
-        <div class="stats-container">
-            <div class="stat-row">
-                <div class="stat-meta">
-                    <span style="color: var(--primary)">Obrigatórias</span>
-                    <span id="txtObg">0 / 154</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="barObg" style="width: 0%; background: var(--primary)"></div>
-                </div>
-            </div>
-
-            <div class="stat-row">
-                <div class="stat-meta">
-                    <span style="color: var(--secondary)">Eletivas MAP</span>
-                    <span id="txtElet">0 / 10</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="barElet" style="width: 0%; background: var(--secondary)"></div>
-                </div>
-            </div>
-
-            <div class="stat-row">
-                <div class="stat-meta">
-                    <span style="color: var(--tertiary)">Livres</span>
-                    <span id="txtLivre">0 / 44</span>
-                </div>
-                <div class="progress-track">
-                    <div class="progress-fill" id="barLivre" style="width: 0%; background: var(--tertiary)"></div>
-                </div>
-            </div>
-            
-            <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 1rem; text-align: center;">
-                *Créditos somados: Aula + Trabalho
-            </div>
-        </div>
-    </aside>
-</div>
-
 <script>
-    // --- CONFIGURAÇÃO DE METAS (CHECKLIST) ---
-    // Baseado na Carga Horária do texto:
-    // Obrigatórias: 2310h = 154 créditos
-    // Eletivas: 150h = 10 créditos
-    // Livres: 660h = 44 créditos
-    const TARGETS = {
-        obg: 154,
-        elet: 10,
-        livre: 44
-    };
-
-    // --- DADOS DA GRADE NA ÍNTEGRA ---
+    // --- DADOS COMPLETOS COM PRÉ-REQUISITOS ---
     const curriculumData = [
-        // --- OBRIGATÓRIAS (1º ao 8º Semestre) ---
-        {
-            title: "1º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAC0110", name: "Introdução à Computação", cr: 4},
-                {code: "MAE0121", name: "Introdução a Probabilidade e a Estatística I", cr: 4},
-                {code: "MAP2110", name: "Introdução aos Modelos Lineares", cr: 6}, // 4+2
-                {code: "MAT2453", name: "Cálculo Diferencial e Integral I", cr: 6}
-            ]
-        },
-        {
-            title: "2º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAC0122", name: "Princípios de Desenvolvimento de Algoritmos", cr: 4},
-                {code: "MAE0212", name: "Introdução à Probabilidade e à Estatística II", cr: 4},
-                {code: "MAT2454", name: "Cálculo Diferencial e Integral II", cr: 4},
-                {code: "MAT3211", name: "Álgebra Linear", cr: 4}
-            ]
-        },
-        {
-            title: "3º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAE0228", name: "Noções de Probabilidade e Processos Estocásticos", cr: 4},
-                {code: "MAP2210", name: "Aplicações de Álgebra Linear", cr: 6}, // 4+2
-                {code: "MAP2216", name: "Análise Aplicada", cr: 5}, // 4+1
-                {code: "MAT3120", name: "Cálculo Diferencial e Integral III", cr: 4}
-            ]
-        },
-        {
-            title: "4º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAC0315", name: "Otimização Linear", cr: 4},
-                {code: "MAE0301", name: "Inferência Estatística Frequentista", cr: 6},
-                {code: "MAP0217", name: "Cálculo Diferencial", cr: 6},
-                {code: "MAP2220", name: "Fundamentos de Análise Numérica", cr: 6} // 4+2
-            ]
-        },
-        {
-            title: "5º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAC0427", name: "Otimização Não Linear", cr: 4},
-                {code: "MAE0302", name: "Inferência Bayesiana", cr: 4},
-                {code: "MAP0316", name: "Equações Diferenciais II", cr: 4},
-                {code: "MAP0327", name: "Mecânica Analítica Clássica", cr: 4}
-            ]
-        },
-        {
-            title: "6º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAP0413", name: "Equações de Derivadas Parciais", cr: 4},
-                {code: "MAP2320", name: "Métodos Numéricos em Equações Diferenciais II", cr: 6}, // 4+2
-                {code: "MAT0225", name: "Funções Analíticas", cr: 4},
-                {code: "MAT0234", name: "Medida e Integração", cr: 4}
-            ]
-        },
-        {
-            title: "7º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAP2419", name: "Introdução ao Trabalho de Formatura", cr: 5}, // 1+4
-                {code: "MAT0334", name: "Análise Funcional", cr: 4}
-            ]
-        },
-        {
-            title: "8º Período Ideal", type: "obg",
-            courses: [
-                {code: "MAP0416", name: "Métodos Matemáticos da Física", cr: 4},
-                {code: "MAP2429", name: "Trabalho de Formatura em Matemática Aplicada", cr: 9} // 1+8
-            ]
-        },
-        
-        // --- OPTATIVAS ELETIVAS MAP ---
-        {
-            title: "Optativas Eletivas (MAP) - 5º/6º Sem", type: "elet",
-            courses: [
-                {code: "MAP2313", name: "Tópicos de Matemática Aplicada", cr: 4},
-                {code: "MAP2501", name: "Tópicos de Matemática Aplicada I", cr: 4},
-                {code: "MAP2505", name: "Tópicos de Matemática Aplicada V", cr: 3}, // 2+1
-                {code: "MAP2321", name: "Técnicas em Teoria de Controle", cr: 4},
-                {code: "MAP2324", name: "Probabilidade Aplicada", cr: 5}, // 4+1
-                {code: "MAP2502", name: "Tópicos de Matemática Aplicada II", cr: 4}
-            ]
-        },
-        {
-            title: "Optativas Eletivas (MAP) - 7º/8º Sem", type: "elet",
-            courses: [
-                {code: "MAP2212", name: "Laboratório de Simulação Estocástica", cr: 6}, // 4+2
-                {code: "MAP2322", name: "Métodos Num. Eq. Diferenciais Parciais", cr: 6}, // 4+2
-                {code: "MAP2503", name: "Tópicos de Matemática Aplicada III", cr: 5}, // 4+1
-                {code: "MAP2504", name: "Tópicos de Matemática Aplicada", cr: 5} // 4+1
-            ]
-        },
+        // 1º SEMESTRE
+        { sem: 1, code: "MAC0110", name: "Introdução à Computação", req: "-" },
+        { sem: 1, code: "MAE0121", name: "Intro. a Probabilidade e Estatística I", req: "-" },
+        { sem: 1, code: "MAP2110", name: "Intro. aos Modelos Lineares", req: "-" },
+        { sem: 1, code: "MAT2453", name: "Cálculo Diferencial e Integral I", req: "-" },
 
-        // --- OPTATIVAS LIVRES (Lista Completa do Texto) ---
-        {
-            title: "Optativas Livres - Iniciais (1º e 2º Sem)", type: "livre",
-            courses: [
-                {code: "ACA0115", name: "Introdução às Ciências Atmosféricas", cr: 6}, // 4+2
-                {code: "MAP0100", name: "Conceitos Introdutórios de Matemática", cr: 3}, // 2+1
-                {code: "4310126", name: "Física I", cr: 6},
-                {code: "AGA0106", name: "Astronomia de Posição", cr: 4},
-                {code: "MAK0136", name: "Arte e Imaginário Contemporâneo", cr: 4},
-                {code: "MAK0138", name: "Monitoria em Arte Visual", cr: 4},
-                {code: "MAK0139", name: "O Papel do Desenho na Arte", cr: 4},
-                {code: "MAP2003", name: "Panoramas da Matemática", cr: 4},
-                {code: "MAT0164", name: "Teoria Elementar dos Números", cr: 4},
-                {code: "QFL0605", name: "Química Geral", cr: 6}
-            ]
-        },
-        {
-            title: "Optativas Livres - 3º Semestre", type: "livre",
-            courses: [
-                {code: "4310137", name: "Física II", cr: 6},
-                {code: "ACA0223", name: "Climatologia I", cr: 4},
-                {code: "AGA0215", name: "Fundamentos de Astronomia", cr: 4},
-                {code: "AGA0502", name: "Planetas e Sistemas Planetários", cr: 4},
-                {code: "MAC0323", name: "Algoritmos e Estruturas de Dados II", cr: 6}, // 4+2
-                {code: "MAE0221", name: "Probabilidade I", cr: 6},
-                {code: "MAK0132", name: "Arte do Século XX no Acervo do MAC", cr: 4},
-                {code: "MAK0133", name: "Interdisciplinaridade nas artes contemporâneas", cr: 4},
-                {code: "MAP1021", name: "Atendimento de Dúvidas de Ensino Básico I", cr: 2}, // 0+2
-                {code: "MAP2001", name: "Matemática, Arquitetura e Design", cr: 4},
-                {code: "MAP2123", name: "Métodos Matemáticos para Atuária I", cr: 4},
-                {code: "MAT0264", name: "Anéis e Corpos", cr: 4}
-            ]
-        },
-        {
-            title: "Optativas Livres - 4º Semestre", type: "livre",
-            courses: [
-                {code: "ACA0324", name: "Meteorologia Física I", cr: 4},
-                {code: "ACA0522", name: "Meteorologia Sinótica I", cr: 3},
-                {code: "AGG0110", name: "Elementos de Geofísica", cr: 4},
-                {code: "AGG0209", name: "Introdução à Petrofísica", cr: 4},
-                {code: "MAE0217", name: "Estatística Descritiva", cr: 4},
-                {code: "MAE0224", name: "Probabilidade II", cr: 4},
-                {code: "MAE0311", name: "Inferência Estatística", cr: 6},
-                {code: "MAP1022", name: "Atendimento de Dúvidas do Ensino Básico II", cr: 2}, // 0+2
-                {code: "MAP2124", name: "Métodos Matemáticos para Atuária II", cr: 4},
-                {code: "MAP2225", name: "Modelos em Atuária e Finanças", cr: 4}, // 2+2
-                {code: "MAP2315", name: "Otimização Linear", cr: 4},
-                {code: "MAT0121", name: "Cálculo Diferencial e Integral II", cr: 6},
-                {code: "MAT0230", name: "Geometria e Desenho Geométrico I", cr: 5}, // 4+1
-                {code: "MAT0265", name: "Grupos", cr: 4},
-                {code: "MAT0326", name: "Geometria Diferencial I", cr: 4}
-            ]
-        },
-        {
-            title: "Optativas Livres - 5º Semestre", type: "livre",
-            courses: [
-                {code: "ACA0330", name: "Introdução à Eletricidade Atmosférica", cr: 4}, // 2+2
-                {code: "ACA0410", name: "Introdução à Química Atmosférica", cr: 4},
-                {code: "ACA0537", name: "Meteorologia Dinâmica I", cr: 5},
-                {code: "AGG0232", name: "Sísmica I", cr: 4},
-                {code: "AGG0243", name: "Métodos Matemáticos em Geofísica", cr: 6},
-                {code: "IOF0201", name: "Fundamentos de Oceanografia Fisica", cr: 3},
-                {code: "MAC0328", name: "Algoritmos em Grafos", cr: 4},
-                {code: "MAC0329", name: "Álgebra Booleana", cr: 4},
-                {code: "MAC0426", name: "Sistemas de Bancos de Dados", cr: 4},
-                {code: "MAE0314", name: "Análise Estatística", cr: 4},
-                {code: "MAE0315", name: "Tecnologia da Amostragem", cr: 4},
-                {code: "MAE0317", name: "Planejamento e Pesquisa I", cr: 4},
-                {code: "MAE0328", name: "Análise de Regressão", cr: 4},
-                {code: "MAE0552", name: "Introdução à Teoria da Informação", cr: 4},
-                {code: "MAP0334", name: "Cálculo Integral", cr: 4},
-                {code: "MAP0431", name: "Intro. Matemática à Mec. dos Fluidos", cr: 4},
-                {code: "MAP2314", name: "Teoria de Inf., Inf. Bayesiana e ML", cr: 4},
-                {code: "MAP2427", name: "Otimização Não Linear", cr: 4},
-                {code: "MAT0240", name: "Geometria e Desenho Geométrico II", cr: 5}, // 4+1
-                {code: "MAT0317", name: "Topologia", cr: 4},
-                {code: "MAT0364", name: "Teoria de Galois", cr: 4},
-                {code: "QBQ2500", name: "Bioquímica e Biologia Molecular", cr: 2}
-            ]
-        },
-        {
-            title: "Optativas Livres - 6º Semestre", type: "livre",
-            courses: [
-                {code: "4300307", name: "Física Matemática II", cr: 4},
-                {code: "AGA0309", name: "Mecânica Celeste", cr: 4},
-                {code: "MAC0325", name: "Otimização Combinatória", cr: 4},
-                {code: "MAC0414", name: "Autômatos, Computabilidade e Complexidade", cr: 4},
-                {code: "MAC0420", name: "Introdução a Computação Gráfica", cr: 4},
-                {code: "MAE0326", name: "Aplicações de Processos Estocásticos", cr: 4},
-                {code: "MAE0327", name: "Planejamento e Pesquisa II", cr: 4},
-                {code: "MAE0330", name: "Análise Multivariada de Dados", cr: 6},
-                {code: "MAT0349", name: "Introdução à Lógica", cr: 4},
-                {code: "MAT0418", name: "Cálculo das Variações", cr: 4}
-            ]
-        },
-        {
-            title: "Optativas Livres - 7º Semestre", type: "livre",
-            courses: [
-                {code: "ACA0226", name: "Climatologia II", cr: 4},
-                {code: "ACA0245", name: "Biometeorologia", cr: 6}, // 4+2
-                {code: "ACA0336", name: "Meteorologia Ambiental", cr: 4},
-                {code: "AGG0222", name: "Física do Interior da Terra", cr: 6}, // 4+2
-                {code: "AGG0305", name: "Teoria de Ondas Sísmicas", cr: 4},
-                {code: "AGG0330", name: "Processamento de Sinais Digitais", cr: 4},
-                {code: "IPN0001", name: "Radioproteção em Aplicações Nucleares", cr: 6}, // 4+2
-                {code: "IPN0004", name: "Gerência de Rejeitos Radioativos", cr: 4}, // 3+1
-                {code: "IPN0005", name: "Tratamento de Água Industrial", cr: 3}, // 2+1
-                {code: "IPN0006", name: "Engenharia de Reatores Nucleares", cr: 5}, // 2+3
-                {code: "IPN0007", name: "Redes Neurais na Eng. Nuclear", cr: 5}, // 2+3
-                {code: "IPN0012", name: "Caracterização Física de Materiais", cr: 5}, // 3+2
-                {code: "IPN0019", name: "Radioquímica", cr: 5}, // 2+3
-                {code: "IPN0020", name: "Efeitos Biológicos das Radiações", cr: 5}, // 2+3
-                {code: "IPN0022", name: "Aplicações da Radiação Ionizante", cr: 5}, // 2+3
-                {code: "IPN0024", name: "Física dos Materiais Estruturais", cr: 6}, // 4+2
-                {code: "MAC0419", name: "Métodos de Otimização em Finanças", cr: 4},
-                {code: "MAC0422", name: "Sistemas Operacionais", cr: 6}, // 4+2
-                {code: "MAC0436", name: "Tópicos de Matemática Discreta I", cr: 4},
-                {code: "MAC0690", name: "Tópicos em Combinatória Contemporânea I", cr: 4},
-                {code: "MAC0691", name: "Tópicos na Teoria Algébrica dos Grafos", cr: 4},
-                {code: "MAC0775", name: "Métodos Probabilísticos em Combinatória I", cr: 4},
-                {code: "MAE0420", name: "Sociometria", cr: 4},
-                {code: "MAE0510", name: "Demografia", cr: 4},
-                {code: "MAE0515", name: "Introdução à Teoria dos Jogos", cr: 4},
-                {code: "MAE0523", name: "Elementos da Teoria das Decisões", cr: 4},
-                {code: "MAE0530", name: "Introdução a Análise Sequêncial", cr: 4},
-                {code: "MAE0532", name: "Controle Estatístico de Qualidade", cr: 4},
-                {code: "MAE0535", name: "Pesquisa de Mercado", cr: 4},
-                {code: "MAE0560", name: "Análise de Dados Categorizados", cr: 4},
-                {code: "MAE0610", name: "Tópicos Especiais de Estatística", cr: 4},
-                {code: "MAP2411", name: "Matemática Industrial I", cr: 4},
-                {code: "MAT0223", name: "Introdução a Teoria dos Números", cr: 4},
-                {code: "MAT0310", name: "Geometria III", cr: 4},
-                {code: "MAT0330", name: "Teoria dos Conjuntos", cr: 4},
-                {code: "MAT0359", name: "Lógica", cr: 4},
-                {code: "MAT0425", name: "Tópicos de Topologia Algébrica", cr: 4}
-            ]
-        },
-        {
-            title: "Optativas Livres - 8º Semestre", type: "livre",
-            courses: [
-                {code: "ACA0415", name: "O Clima da Terra", cr: 5}, // 4+1
-                {code: "AGG0409", name: "Geomagnetismo", cr: 4},
-                {code: "MAC0333", name: "Recuperação de Informação", cr: 4},
-                {code: "MAC0425", name: "Inteligência Artificial", cr: 6}, // 4+2
-                {code: "MAC0536", name: "Tópicos de Matemática Discreta II", cr: 4},
-                {code: "MAC0692", name: "Tópicos em Combinatória Contemporânea II", cr: 4},
-                {code: "MAC0776", name: "Métodos Probabilísticos em Combinatória II", cr: 4},
-                {code: "MAE0418", name: "Estatística Documentária", cr: 4},
-                {code: "MAE0512", name: "Biometria", cr: 4},
-                {code: "MAE0520", name: "Psicometria", cr: 4},
-                {code: "MAP2421", name: "Matemática Industrial II", cr: 4},
-                {code: "MAP2432", name: "Princ. Computacionais em Dinâmica de Fluidos", cr: 4},
-                {code: "MAP2433", name: "Indução Estatística, Ontologia e Metafísica", cr: 4},
-                {code: "MAT0427", name: "Tópicos de Geometria Diferencial", cr: 4},
-                {code: "MAT0431", name: "Introdução à Topologia Algébrica", cr: 4},
-                {code: "MAT0432", name: "Introdução à Topologia Diferencial", cr: 4}
-            ]
-        }
+        // 2º SEMESTRE
+        { sem: 2, code: "MAC0122", name: "Princípios de Desenv. de Algoritmos", req: "MAC0110" },
+        { sem: 2, code: "MAE0212", name: "Intro. a Probabilidade e Estatística II", req: "MAE0121" },
+        { sem: 2, code: "MAT2454", name: "Cálculo Diferencial e Integral II", req: "MAT2453" },
+        { sem: 2, code: "MAT3211", name: "Álgebra Linear", req: "MAP2110" },
+
+        // 3º SEMESTRE
+        { sem: 3, code: "MAE0228", name: "Noções de Prob. e Processos Estocásticos", req: "MAE0121" },
+        { sem: 3, code: "MAP2210", name: "Aplicações de Álgebra Linear", req: "MAP2110, MAT3211" },
+        { sem: 3, code: "MAP2216", name: "Análise Aplicada", req: "MAT2453" },
+        { sem: 3, code: "MAT3120", name: "Cálculo Diferencial e Integral III", req: "MAT2454" },
+
+        // 4º SEMESTRE
+        { sem: 4, code: "MAC0315", name: "Otimização Linear", req: "MAT3211" },
+        { sem: 4, code: "MAE0301", name: "Inferência Estatística Frequentista", req: "MAE0212, MAE0228, MAT3120, MAT3211" },
+        { sem: 4, code: "MAP0217", name: "Cálculo Diferencial", req: "MAP2216, MAT3211" },
+        { sem: 4, code: "MAP2220", name: "Fundamentos de Análise Numérica", req: "MAP2210, MAT2454" },
+
+        // 5º SEMESTRE
+        { sem: 5, code: "MAC0427", name: "Otimização Não Linear", req: "MAT3211" },
+        { sem: 5, code: "MAE0302", name: "Inferência Bayesiana", req: "MAE0228, MAE0212" },
+        { sem: 5, code: "MAP0316", name: "Equações Diferenciais II", req: "MAP0217" },
+        { sem: 5, code: "MAP0327", name: "Mecânica Analítica Clássica", req: "MAT3120" },
+
+        // 6º SEMESTRE
+        { sem: 6, code: "MAP0413", name: "Equações de Derivadas Parciais", req: "MAT3120" },
+        { sem: 6, code: "MAP2320", name: "Mét. Numéricos em Eq. Diferenciais II", req: "MAP2220" },
+        { sem: 6, code: "MAT0225", name: "Funções Analíticas", req: "MAP2216, MAT3120" },
+        { sem: 6, code: "MAT0234", name: "Medida e Integração", req: "MAT3120, MAP2216" },
+
+        // 7º SEMESTRE
+        { sem: 7, code: "MAP2419", name: "Intro. ao Trabalho de Formatura", req: "-" },
+        { sem: 7, code: "MAT0334", name: "Análise Funcional", req: "MAP2210, MAP0217" },
+
+        // 8º SEMESTRE
+        { sem: 8, code: "MAP0416", name: "Métodos Matemáticos da Física", req: "MAP0413" },
+        { sem: 8, code: "MAP2429", name: "Trabalho de Formatura em Matemática Aplicada", req: "-" },
+
+        // ELETIVAS MAP (Exemplos principais do texto)
+        { sem: 'Elet', code: "MAP2313", name: "Tópicos de Mat. Aplicada", req: "-" },
+        { sem: 'Elet', code: "MAP2321", name: "Técnicas em Teoria de Controle", req: "MAP2310 ou MAP0316" },
+        { sem: 'Elet', code: "MAP2212", name: "Lab. de Simulação Estocástica", req: "MAE0212, MAC0122" },
+        { sem: 'Elet', code: "MAP2322", name: "Mét. Num. para Eq. Dif. Parciais", req: "MAP2320" },
+
+        // OPTATIVAS LIVRES (Alguns exemplos para não ficar vazio, adicione as suas aqui)
+        { sem: 'Livre', code: "ACA0115", name: "Intro. às Ciências Atmosféricas", req: "-" },
+        { sem: 'Livre', code: "MAP0100", name: "Conceitos Introdutórios de Matemática", req: "-" },
+        { sem: 'Livre', code: "4310126", name: "Física I", req: "MAP2110, MAT2453" },
+        { sem: 'Livre', code: "MAC0323", name: "Algoritmos e Estruturas de Dados II", req: "MAC0122" }
     ];
 
-    // Lógica da Aplicação
-    const container = document.getElementById('curriculumContainer');
+    // --- LÓGICA DO APP ---
+
+    // Recuperar estados
+    let completed = JSON.parse(localStorage.getItem('bmac_done')) || [];
+    let doing = JSON.parse(localStorage.getItem('bmac_doing')) || [];
+    let observations = JSON.parse(localStorage.getItem('bmac_obs')) || {};
+
+    const tableBody = document.getElementById('tableBody');
     const searchInput = document.getElementById('searchInput');
 
-    // Recuperar LocalStorage
-    const savedData = JSON.parse(localStorage.getItem('bmac_tracker_full')) || [];
-
-    function render(filter = "") {
-        container.innerHTML = "";
+    function renderTable(filter = "") {
+        tableBody.innerHTML = "";
         
-        curriculumData.forEach(block => {
-            // Filtragem
-            const filteredCourses = block.courses.filter(c => 
-                c.code.toLowerCase().includes(filter.toLowerCase()) || 
-                c.name.toLowerCase().includes(filter.toLowerCase()) ||
-                block.title.toLowerCase().includes(filter.toLowerCase())
-            );
+        let filteredData = curriculumData.filter(item => 
+            item.code.toLowerCase().includes(filter.toLowerCase()) || 
+            item.name.toLowerCase().includes(filter.toLowerCase()) ||
+            item.req.toLowerCase().includes(filter.toLowerCase())
+        );
 
-            if (filteredCourses.length === 0) return;
+        filteredData.forEach(course => {
+            const isDone = completed.includes(course.code);
+            const isDoing = doing.includes(course.code);
+            const userObs = observations[course.code] || "";
 
-            // Criar Bloco
-            const blockDiv = document.createElement('div');
-            blockDiv.className = 'semester-block';
-            
-            // Badge Tipo
-            let badgeClass = 'badge-obg';
-            let badgeText = 'Obrigatória';
-            if(block.type === 'elet') { badgeClass = 'badge-elet'; badgeText = 'Eletiva MAP'; }
-            if(block.type === 'livre') { badgeClass = 'badge-livre'; badgeText = 'Opt. Livre'; }
+            // Definir Status e Classes
+            let statusText = "Pendente";
+            let statusClass = "status-pending";
+            let rowClass = "";
 
-            blockDiv.innerHTML = `
-                <div class="semester-title">
-                    ${block.title}
-                    <span class="semester-type-badge ${badgeClass}">${badgeText}</span>
-                </div>
-                <div class="course-grid"></div>
-            `;
-            
-            const grid = blockDiv.querySelector('.course-grid');
-
-            filteredCourses.forEach(course => {
-                const isChecked = savedData.includes(course.code) ? 'checked' : '';
-                
-                const label = document.createElement('label');
-                label.className = 'course-item';
-                label.innerHTML = `
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" 
-                               data-code="${course.code}" 
-                               data-cr="${course.cr}" 
-                               data-type="${block.type}"
-                               ${isChecked}>
-                    </div>
-                    <div class="course-info">
-                        <div class="course-header">
-                            <span class="code">${course.code}</span>
-                            <span class="credits">${course.cr} cr</span>
-                        </div>
-                        <div class="name">${course.name}</div>
-                    </div>
-                `;
-                grid.appendChild(label);
-            });
-
-            container.appendChild(blockDiv);
-        });
-
-        // Adicionar eventos aos novos checkboxes
-        document.querySelectorAll('input[type="checkbox"]').forEach(box => {
-            box.addEventListener('change', updateStats);
-        });
-    }
-
-    function updateStats() {
-        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-        let totals = { obg: 0, elet: 0, livre: 0, grandTotal: 0 };
-        let checkedCodes = [];
-
-        checkboxes.forEach(box => {
-            if (box.checked) {
-                const cr = parseInt(box.dataset.cr);
-                const type = box.dataset.type;
-                
-                if (totals[type] !== undefined) totals[type] += cr;
-                totals.grandTotal += cr;
-                checkedCodes.push(box.dataset.code);
+            if (isDone) {
+                statusText = "Concluído";
+                statusClass = "status-done";
+                rowClass = "row-done";
+            } else if (isDoing) {
+                statusText = "Cursando";
+                statusClass = "status-doing";
+                rowClass = "row-doing";
             }
+
+            const tr = document.createElement('tr');
+            tr.className = rowClass;
+            tr.innerHTML = `
+                <td class="checkbox-cell">
+                    <input type="checkbox" 
+                        onchange="toggleDone('${course.code}', this)" 
+                        ${isDone ? 'checked' : ''}>
+                </td>
+                <td class="code">${course.code}</td>
+                <td class="name">${course.name}</td>
+                <td style="text-align: center;">
+                    <span class="status-badge ${statusClass}">${statusText}</span>
+                </td>
+                <td class="checkbox-cell">
+                    <input type="checkbox" 
+                        onchange="toggleDoing('${course.code}', this)" 
+                        ${isDoing ? 'checked' : ''} 
+                        ${isDone ? 'disabled' : ''}>
+                </td>
+                <td class="req-text">${course.req}</td>
+                <td>
+                    <input type="text" class="obs-input" 
+                        value="${userObs}" 
+                        placeholder="..." 
+                        oninput="saveObs('${course.code}', this.value)">
+                </td>
+            `;
+            tableBody.appendChild(tr);
         });
 
-        // Persistência
-        localStorage.setItem('bmac_tracker_full', JSON.stringify(checkedCodes));
-
-        // UI Updates
-        document.getElementById('totalCredits').textContent = totals.grandTotal;
-
-        updateBar('Obg', totals.obg, TARGETS.obg);
-        updateBar('Elet', totals.elet, TARGETS.elet);
-        updateBar('Livre', totals.livre, TARGETS.livre);
+        updateMetrics();
     }
 
-    function updateBar(suffix, value, max) {
-        const pct = Math.min((value / max) * 100, 100);
-        document.getElementById(`bar${suffix}`).style.width = `${pct}%`;
-        document.getElementById(`txt${suffix}`).textContent = `${value} / ${max}`;
-    }
+    // --- AÇÕES ---
 
-    // Evento de Busca
-    searchInput.addEventListener('input', (e) => {
-        render(e.target.value);
-        recalculateFromData();
-    });
-
-    // Função de cálculo "Robusta" que não depende do DOM visível (para quando filtrar)
-    function recalculateFromData() {
-        let totals = { obg: 0, elet: 0, livre: 0, grandTotal: 0 };
-        const currentSaved = JSON.parse(localStorage.getItem('bmac_tracker_full')) || [];
-
-        // Varre todos os dados originais
-        curriculumData.forEach(block => {
-            block.courses.forEach(c => {
-                if (currentSaved.includes(c.code)) {
-                    if (totals[block.type] !== undefined) totals[block.type] += c.cr;
-                    totals.grandTotal += c.cr;
-                }
-            });
-        });
-
-        document.getElementById('totalCredits').textContent = totals.grandTotal;
-        updateBar('Obg', totals.obg, TARGETS.obg);
-        updateBar('Elet', totals.elet, TARGETS.elet);
-        updateBar('Livre', totals.livre, TARGETS.livre);
-    }
-
-    // Override do updateStats para usar a função robusta e salvar o state antes
-    function updateStats(e) {
-        // Atualizar o array de salvos baseados no clique atual
-        let currentSaved = JSON.parse(localStorage.getItem('bmac_tracker_full')) || [];
-        const code = e.target.dataset.code;
-        
-        if(e.target.checked) {
-            if(!currentSaved.includes(code)) currentSaved.push(code);
+    function toggleDone(code, el) {
+        if (el.checked) {
+            if (!completed.includes(code)) completed.push(code);
+            // Se concluiu, remove de "cursando"
+            doing = doing.filter(c => c !== code);
         } else {
-            currentSaved = currentSaved.filter(c => c !== code);
+            completed = completed.filter(c => c !== code);
         }
-        
-        localStorage.setItem('bmac_tracker_full', JSON.stringify(currentSaved));
-        recalculateFromData();
+        saveAll();
+        renderTable(searchInput.value);
     }
 
-    // Inicialização
-    render();
-    recalculateFromData();
+    function toggleDoing(code, el) {
+        if (el.checked) {
+            if (!doing.includes(code)) doing.push(code);
+        } else {
+            doing = doing.filter(c => c !== code);
+        }
+        saveAll();
+        renderTable(searchInput.value);
+    }
+
+    function saveObs(code, value) {
+        observations[code] = value;
+        localStorage.setItem('bmac_obs', JSON.stringify(observations));
+    }
+
+    function saveAll() {
+        localStorage.setItem('bmac_done', JSON.stringify(completed));
+        localStorage.setItem('bmac_doing', JSON.stringify(doing));
+    }
+
+    function resetData() {
+        if(confirm("Tem certeza? Isso apagará todo o progresso.")) {
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
+    // --- CÁLCULOS ---
+
+    function updateMetrics() {
+        const total = curriculumData.length;
+        const doneCount = completed.length;
+        const doingCount = doing.length;
+        
+        // 1. Quantidade de matérias que falta fazer (Total - Concluídas)
+        const missing = total - doneCount;
+
+        // 2. Porcentagem já concluída
+        const percent = total > 0 ? ((doneCount / total) * 100).toFixed(1) : 0;
+
+        // 3. Matérias que faltarão após concluir as em andamento
+        // (Total - (Concluídas + Cursando))
+        const projectedMissing = total - (doneCount + doingCount);
+
+        // Atualizar DOM
+        document.getElementById('totalCount').innerText = total;
+        document.getElementById('completedCount').innerText = doneCount;
+        document.getElementById('missingCount').innerText = missing;
+        document.getElementById('doingCount').innerText = doingCount;
+        document.getElementById('projectedMissing').innerText = projectedMissing;
+        
+        document.getElementById('progressBar').style.width = `${percent}%`;
+        document.getElementById('percentText').innerText = `${percent}%`;
+    }
+
+    // --- INICIALIZAÇÃO ---
+    searchInput.addEventListener('input', (e) => renderTable(e.target.value));
+    renderTable();
 
 </script>
 
