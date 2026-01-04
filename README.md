@@ -1,7 +1,7 @@
 # COLLEGE_SCHEDULE
-# 🎓 Tracker BMAC - Métodos Matemáticos (Grade Curricular)
+# 🎓 Matemática Aplicada Computacional -  Habilitação em Estatística Econômica
 
-> Uma ferramenta web interativa para acompanhamento de progresso acadêmico no curso de Matemática Aplicada e Computacional (foco em Métodos Matemáticos).
+> Uma ferramenta web interativa para acompanhamento de progresso acadêmico no curso de Matemática Aplicada e Computacional (Habilitação em Estatística Econômica).
 
 ![Status](https://img.shields.io/badge/Status-Funcional-brightgreen)
 ![Language](https://img.shields.io/badge/Linguagem-HTML%2FJS-orange)
